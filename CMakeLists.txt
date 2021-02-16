@@ -8,7 +8,15 @@ endif()
 
 add_library(mcpelauncher-core include/mcpelauncher/hook.h include/mcpelauncher/mod_loader.h include/mcpelauncher/hybris_utils.h include/mcpelauncher/patch_utils.h include/mcpelauncher/crash_handler.h include/mcpelauncher/minecraft_utils.h src/hook.cpp src/mod_loader.cpp src/hybris_utils.cpp src/hybris_android_log_hook.cpp src/crash_handler.cpp src/patch_utils.cpp src/minecraft_utils.cpp include/mcpelauncher/minecraft_version.h src/minecraft_version.cpp)
 target_include_directories(mcpelauncher-core PUBLIC include/)
-target_link_libraries(mcpelauncher-core mcpelauncher-common logger linker libc-shim minecraft-imported-symbols file-util ${CMAKE_DL_LIBS})
+target_link_libraries(mcpelauncher-core PUBLIC mcpelauncher-common logger linker libc-shim minecraft-imported-symbols file-util ${CMAKE_DL_LIBS})
+
+# Enter linker private compat
+get_target_property(LINKER_PRIVATE_INCLUDE_DIRECTORIES linker INCLUDE_DIRECTORIES)
+get_target_property(LINKER_PRIVATE_COMPILE_OPTIONS linker COMPILE_OPTIONS)
+get_target_property(LINKER_PRIVATE_COMPILE_DEFINITIONS linker COMPILE_DEFINITIONS)
+target_include_directories(mcpelauncher-core PRIVATE ${LINKER_PRIVATE_INCLUDE_DIRECTORIES})
+target_compile_definitions(mcpelauncher-core PRIVATE ${LINKER_PRIVATE_COMPILE_DEFINITIONS})
+target_compile_options(mcpelauncher-core PRIVATE ${LINKER_PRIVATE_COMPILE_OPTIONS})
 
 if (APPLE)
     target_link_libraries(mcpelauncher-core osx-elf-header)
